@@ -35,7 +35,7 @@ class Admin(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
         
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -610,6 +610,19 @@ def duplicate_form(form_id):
         'form_id': new_form_id,
         'redirect_url': url_for('create_form') + f'?template_id={new_form_id}'
     })
+
+# 重置管理员密码的路由 (临时使用，修复后应删除)
+@app.route('/reset_admin_password/<username>/<new_password>')
+def reset_admin_password(username, new_password):
+    admin = Admin.query.filter_by(username=username).first()
+    if not admin:
+        return jsonify({'error': '管理员不存在'}), 404
+    
+    # 使用新方法设置密码
+    admin.set_password(new_password)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': f'管理员 {username} 的密码已重置'})
 
 if __name__ == '__main__':
     with app.app_context():
