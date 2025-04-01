@@ -1,0 +1,1287 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ form.title }} - 结果统计{% endblock %}
+
+{% block custom_styles %}
+.results-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.results-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 1rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+}
+
+.section-title {
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+}
+
+.section-title i {
+    margin-right: 10px;
+    background-color: var(--primary-color);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-card {
+    margin-bottom: 35px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+    border-radius: 10px;
+}
+
+.stat-card:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card .card-header {
+    background-color: white;
+    padding: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.stat-card .card-header h5 {
+    margin-bottom: 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.question-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    margin-right: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+}
+
+.question-number:after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0.6;
+}
+
+.question-type-badge {
+    font-size: 0.75rem;
+    padding: 5px 12px;
+    border-radius: 12px;
+    margin-left: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.chart-container {
+    height: 300px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid #f0f0f0;
+}
+
+.responsive-table {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+
+.responsive-table table {
+    margin-bottom: 0;
+}
+
+.responsive-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.responsive-table td {
+    vertical-align: middle;
+}
+
+.stats-summary {
+    background-color: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+
+.stat-item {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    flex: 1;
+    min-width: 150px;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.percentage-bar {
+    height: 24px;
+    background-color: #edf2f7;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.15);
+    border: 1px solid #d1d9e6;
+    position: relative;
+}
+
+.percentage-fill {
+    height: 100%;
+    background-color: var(--primary-color);
+    background-image: linear-gradient(45deg, rgba(255,255,255,.2) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.2) 50%, rgba(255,255,255,.2) 75%, transparent 75%, transparent);
+    background-size: 1rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 700;
+    transition: width 0.6s ease;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+    border-right: 1px solid rgba(0,0,0,0.1);
+}
+
+.percentage-fill:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.05) 100%);
+    pointer-events: none;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.action-buttons .btn {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.action-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.results-header .action-buttons .btn {
+    background-color: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: white;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    padding: 10px 15px;
+}
+
+.results-header .action-buttons .btn i {
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3));
+}
+
+.results-header .action-buttons .btn:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.share-buttons .btn {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    padding: 8px 16px;
+    font-weight: 600;
+    border-width: 2px;
+}
+
+.share-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.text-answers-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.text-answer-item {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s ease;
+}
+
+.text-answer-item:hover {
+    background-color: #f8f9fa;
+}
+
+.text-answer-item:last-child {
+    border-bottom: none;
+}
+
+.text-answer-content {
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-top: 8px;
+    border: 1px solid #eee;
+}
+
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.tab-button {
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: white;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.tab-button.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.data-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f0f4f8 !important;
+    z-index: 10;
+    border-bottom: 2px solid #dee2e6;
+    color: #495057;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: #f9fbfd;
+}
+
+.data-table tbody tr:hover {
+    background-color: #f0f4f8;
+}
+
+.data-table td {
+    vertical-align: middle;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.empty-state img {
+    width: 120px;
+    opacity: 0.6;
+    margin-bottom: 20px;
+}
+
+/* 移动端适配 */
+@media (max-width: 767.98px) {
+    .results-header {
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+    }
+    
+    .results-badge {
+        position: static;
+        display: inline-block;
+        margin-top: 10px;
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+    
+    .section-title {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+    
+    .section-title i {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .stat-card {
+        margin-bottom: 20px;
+    }
+    
+    .stat-card .card-header {
+        padding: 15px;
+    }
+    
+    .stat-card .card-header h5 {
+        font-size: 1rem;
+    }
+    
+    .question-number {
+        width: 24px;
+        height: 24px;
+        font-size: 0.8rem;
+        margin-right: 8px;
+    }
+    
+    .question-type-badge {
+        font-size: 0.65rem;
+        padding: 3px 6px;
+    }
+    
+    .chart-container {
+        height: 250px;
+        padding: 10px;
+    }
+    
+    .stats-summary {
+        gap: 10px;
+    }
+    
+    .stat-item {
+        min-width: 100%;
+        padding: 12px;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .action-buttons {
+        flex-wrap: wrap;
+    }
+    
+    .action-buttons .btn {
+        flex: 1;
+        min-width: 45%;
+        padding: 8px;
+        font-size: 0.85rem;
+    }
+    
+    .tab-buttons {
+        flex-wrap: wrap;
+    }
+    
+    .tab-button {
+        flex: 1;
+        text-align: center;
+        padding: 6px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .percentage-bar {
+        height: 16px;
+    }
+    
+    .percentage-fill {
+        font-size: 0.7rem;
+    }
+    
+    .share-buttons .btn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .results-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .share-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .share-buttons .btn {
+        margin-bottom: 5px;
+        width: 100%;
+    }
+    
+    .action-buttons .btn {
+        min-width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .share-modal-body {
+        flex-direction: column;
+    }
+    
+    .share-modal-qr {
+        margin-bottom: 15px;
+    }
+}
+
+/* 优化分享模态框 */
+.modal-fullscreen-sm-down {
+    max-width: none;
+}
+
+@media (max-width: 767.98px) {
+    .modal-fullscreen-sm-down {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+    }
+    
+    .modal-fullscreen-sm-down .modal-content {
+        height: 100%;
+        border: 0;
+        border-radius: 0;
+    }
+}
+
+.nav-tabs {
+    border-bottom: 1px solid #dee2e6;
+    background-color: #f0f4f8;
+    border-radius: 8px 8px 0 0;
+    padding: 10px 10px 0 10px;
+    margin-bottom: 0 !important;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+}
+
+.nav-tabs .nav-link {
+    font-weight: 600;
+    padding: 12px 20px;
+    border: 1px solid transparent;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    transition: all 0.3s ease;
+    color: #495057;
+    background-color: rgba(54, 162, 235, 0.15);
+    margin-right: 5px;
+    box-shadow: 0 -1px 3px rgba(0,0,0,0.05);
+}
+
+.nav-tabs .nav-link.active {
+    color: #fff;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    transform: translateY(-3px);
+}
+
+.nav-tabs .nav-link:not(.active):hover {
+    background-color: rgba(54, 162, 235, 0.3);
+    border-color: #c3d7eb;
+    color: var(--primary-color);
+}
+
+.tab-content {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.tab-content > .tab-pane {
+    padding: 10px 0;
+}
+
+.badge {
+    font-weight: 600;
+    padding: 5px 8px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="results-header">
+            <span class="results-badge">{{ answers|length }} 份回答</span>
+            <h1 class="mb-3">{{ form.title }} - 结果统计</h1>
+            {% if form.description %}
+            <p class="mb-2">{{ form.description }}</p>
+            {% endif %}
+            <div class="action-buttons mt-4">
+                <a href="/export/{{ form.id }}" class="btn btn-light">
+                    <i class="fas fa-file-excel me-2"></i>导出为Excel
+                </a>
+                <button class="btn btn-light" id="print-results">
+                    <i class="fas fa-print me-2"></i>打印结果
+                </button>
+                <a href="/form/{{ form.id }}" class="btn btn-light">
+                    <i class="fas fa-edit me-2"></i>填写表单
+                </a>
+                <button class="btn btn-light" id="share-form-btn">
+                    <i class="fas fa-share-alt me-2"></i>分享表单
+                </button>
+                <button class="btn btn-light" id="use-as-template">
+                    <i class="fas fa-copy me-2"></i>用作模板
+                </button>
+            </div>
+        </div>
+        
+        {% if answers %}
+            <div class="stats-summary">
+                <div class="stat-item">
+                    <div class="stat-value">{{ answers|length }}</div>
+                    <div class="stat-label">总回答数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ questions|length }}</div>
+                    <div class="stat-label">问题数量</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="completion-rate">0%</div>
+                    <div class="stat-label">平均完成率</div>
+                </div>
+            </div>
+            
+            <h2 class="section-title"><i class="fas fa-chart-bar"></i>问题统计</h2>
+            
+            <ul class="nav nav-tabs mb-4" id="resultTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="statistics-tab" data-bs-toggle="tab" 
+                            data-bs-target="#statistics" type="button" role="tab" 
+                            aria-controls="statistics" aria-selected="true">
+                        <i class="fas fa-chart-pie me-2"></i>图表统计
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="raw-data-tab" data-bs-toggle="tab" 
+                            data-bs-target="#raw-data" type="button" role="tab" 
+                            aria-controls="raw-data" aria-selected="false">
+                        <i class="fas fa-table me-2"></i>原始数据
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="resultTabsContent">
+                <div class="tab-pane fade show active" id="statistics" role="tabpanel" aria-labelledby="statistics-tab">
+                    {% for question in questions %}
+                    {% set question_index = loop.index0 %}
+                    <div class="card stat-card">
+                        <div class="card-header">
+                            <h5>
+                                <span class="question-number">{{ loop.index }}</span>
+                                {{ question.title }}
+                                {% if question.type == 'text' %}
+                                    <span class="badge bg-primary question-type-badge">文本题</span>
+                                {% elif question.type == 'radio' %}
+                                    <span class="badge bg-info question-type-badge">单选题</span>
+                                {% elif question.type == 'checkbox' %}
+                                    <span class="badge bg-success question-type-badge">多选题</span>
+                                {% elif question.type == 'signature' %}
+                                    <span class="badge bg-warning question-type-badge">电子签名</span>
+                                {% elif question.type == 'image' %}
+                                    <span class="badge bg-success question-type-badge">图片上传</span>
+                                {% endif %}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if question.type == 'text' %}
+                                <div class="text-answers-list">
+                                    {% for answer in answers %}
+                                    <div class="text-answer-item">
+                                        <div class="d-flex justify-content-between">
+                                            <strong class="text-primary">#{{ loop.index }}</strong>
+                                            <span class="text-muted small">回答时间: {{ '模拟时间' }}</span>
+                                        </div>
+                                        <div class="text-answer-content">
+                                            {{ answer[question_index].answer or '未填写' }}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% elif question.type == 'signature' %}
+                                <div class="text-answers-list">
+                                    {% for answer in answers %}
+                                    <div class="text-answer-item">
+                                        <div class="d-flex justify-content-between">
+                                            <strong class="text-primary">#{{ loop.index }}</strong>
+                                            <span class="text-muted small">回答时间: {{ '模拟时间' }}</span>
+                                        </div>
+                                        <div class="text-answer-content">
+                                            {% if answer[question_index].answer %}
+                                                <img src="{{ answer[question_index].answer }}" alt="签名" class="img-fluid" style="max-height: 150px;">
+                                            {% else %}
+                                                <span class="text-muted">未签名</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% elif question.type == 'image' %}
+                                <div class="text-answers-list">
+                                    {% for answer in answers %}
+                                    <div class="text-answer-item">
+                                        <div class="d-flex justify-content-between">
+                                            <strong class="text-primary">#{{ loop.index }}</strong>
+                                            <span class="text-muted small">回答时间: {{ '模拟时间' }}</span>
+                                        </div>
+                                        <div class="text-answer-content text-center">
+                                            {% if answer[question_index].answer %}
+                                                <img src="{{ answer[question_index].answer }}" alt="上传图片" class="img-thumbnail" style="max-height: 300px;">
+                                                <div class="mt-2">
+                                                    <a href="{{ answer[question_index].answer }}" class="btn btn-sm btn-outline-primary" target="_blank" download="image.jpg">
+                                                        <i class="fas fa-download me-1"></i>下载图片
+                                                    </a>
+                                                </div>
+                                            {% else %}
+                                                <span class="text-muted">未上传图片</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% elif question.type == 'radio' %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="table-responsive responsive-table">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>选项</th>
+                                                        <th>数量</th>
+                                                        <th width="40%">比例</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for option in question.options %}
+                                                    <tr>
+                                                        <td><strong>{{ option }}</strong></td>
+                                                        {% set count = namespace(value=0) %}
+                                                        {% for answer in answers %}
+                                                            {% if answer[question_index].answer == option %}
+                                                                {% set count.value = count.value + 1 %}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                        <td><span class="badge bg-primary">{{ count.value }}</span></td>
+                                                        <td>
+                                                            {% set percentage = 0 if answers|length == 0 else (count.value / answers|length * 100)|round(1) %}
+                                                            <div class="percentage-bar">
+                                                                <div class="percentage-fill" style="width: {{ percentage }}%">
+                                                                    {{ percentage }}%
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="chart-container">
+                                            <canvas id="chart-question-{{ question_index }}"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% elif question.type == 'checkbox' %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="table-responsive responsive-table">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>选项</th>
+                                                        <th>数量</th>
+                                                        <th width="40%">比例</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for option in question.options %}
+                                                    <tr>
+                                                        <td><strong>{{ option }}</strong></td>
+                                                        {% set count = namespace(value=0) %}
+                                                        {% for answer in answers %}
+                                                            {% if answer[question_index].answer and option in answer[question_index].answer %}
+                                                                {% set count.value = count.value + 1 %}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                        <td><span class="badge bg-success">{{ count.value }}</span></td>
+                                                        <td>
+                                                            {% set percentage = 0 if answers|length == 0 else (count.value / answers|length * 100)|round(1) %}
+                                                            <div class="percentage-bar">
+                                                                <div class="percentage-fill" style="width: {{ percentage }}%">
+                                                                    {{ percentage }}%
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="chart-container">
+                                            <canvas id="chart-question-{{ question_index }}"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="tab-pane fade" id="raw-data" role="tabpanel" aria-labelledby="raw-data-tab">
+                    <div class="card">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-table me-2 text-primary"></i>所有回答数据
+                            </h5>
+                            <p class="text-muted small mb-0 mt-1">此表格显示所有提交的原始数据</p>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover data-table">
+                                    <thead>
+                                        <tr class="bg-light">
+                                            <th>#</th>
+                                            <th>用户信息</th>
+                                            {% for question in questions %}
+                                            <th>{{ question.title }}</th>
+                                            {% endfor %}
+                                            <th>提交时间</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in range(answers|length) %}
+                                        <tr>
+                                            <td><strong>{{ i + 1 }}</strong></td>
+                                            <td>
+                                                {% if user_info_list[i] %}
+                                                <div class="user-data">
+                                                    {% if user_info_list[i].qq_number %}
+                                                    <div><i class="fab fa-qq text-primary me-1"></i> {{ user_info_list[i].qq_number }}</div>
+                                                    {% endif %}
+                                                    {% if user_info_list[i].nickname %}
+                                                    <div><i class="fas fa-user text-success me-1"></i> {{ user_info_list[i].nickname }}</div>
+                                                    {% endif %}
+                                                    {% if user_info_list[i].class_number %}
+                                                    <div><i class="fas fa-users text-info me-1"></i> {{ user_info_list[i].class_number }}</div>
+                                                    {% endif %}
+                                                    {% if user_info_list[i].student_id %}
+                                                    <div><i class="fas fa-id-card text-warning me-1"></i> {{ user_info_list[i].student_id }}</div>
+                                                    {% endif %}
+                                                </div>
+                                                {% else %}
+                                                <span class="text-muted">无用户信息</span>
+                                                {% endif %}
+                                            </td>
+                                            {% for question in questions %}
+                                            {% set question_index = loop.index0 %}
+                                                <td>
+                                                    {% if question.type == 'signature' and answers[i][question_index].answer %}
+                                                        <img src="{{ answers[i][question_index].answer }}" alt="签名" class="img-fluid" style="max-height: 50px;">
+                                                    {% elif question.type == 'image' and answers[i][question_index].answer %}
+                                                        <img src="{{ answers[i][question_index].answer }}" alt="上传图片" class="img-fluid" style="max-height: 50px;">
+                                                        <a href="{{ answers[i][question_index].answer }}" target="_blank" class="ms-1 small">
+                                                            <i class="fas fa-external-link-alt"></i>
+                                                        </a>
+                                                    {% elif answers[i][question_index].answer is string %}
+                                                        {{ answers[i][question_index].answer or '-' }}
+                                                    {% elif answers[i][question_index].answer is iterable and answers[i][question_index].answer %}
+                                                        {{ answers[i][question_index].answer|join(', ') }}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+                                            {% endfor %}
+                                            <td>{{ '模拟时间' }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-state card">
+                <div class="card-body">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4076/4076448.png" alt="No data" class="mb-3">
+                    <h3>还没有任何人提交回答</h3>
+                    <p class="text-muted mb-4">分享表单链接给更多人，收集他们的回答。</p>
+                    <div class="d-flex justify-content-center">
+                        <a href="/form/{{ form.id }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-edit me-2"></i>填写表单
+                        </a>
+                        <button class="btn btn-outline-primary btn-lg ms-2" id="copy-link">
+                            <i class="fas fa-copy me-2"></i>复制链接
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 模板创建对话框 -->
+<div class="modal fade" id="templateModal" tabindex="-1" aria-labelledby="templateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="templateModalLabel">使用此表单作为模板</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>您将创建一个基于此表单的新表单，所有问题结构将被复制。</p>
+                <div class="mb-3">
+                    <label for="new-form-title" class="form-label">新表单标题</label>
+                    <input type="text" class="form-control" id="new-form-title" value="{{ form.title }} - 副本">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="create-template">创建新表单</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if answers %}
+    // 计算完成率
+    let totalQuestions = {{ questions|length }};
+    let totalAnswers = {{ answers|length }};
+    let totalPossibleAnswers = totalQuestions * totalAnswers;
+    
+    let answeredCount = 0;
+    {% for answer in answers %}
+        {% for item in answer %}
+            {% if item.answer %}
+                answeredCount += 1;
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+    
+    let completionRate = totalPossibleAnswers > 0 ? 
+        Math.round((answeredCount / totalPossibleAnswers) * 100) : 0;
+    document.getElementById('completion-rate').textContent = completionRate + '%';
+    
+    // 初始化图表
+    {% for question in questions %}
+    {% set question_index = loop.index0 %}
+        {% if question.type == 'radio' or question.type == 'checkbox' %}
+            var ctx{{ question_index }} = document.getElementById('chart-question-{{ question_index }}').getContext('2d');
+            
+            // 收集数据
+            var labels{{ question_index }} = {{ question.options|tojson }};
+            var data{{ question_index }} = [];
+            var backgroundColors = [
+                'rgba(54, 162, 235, 0.9)',
+                'rgba(75, 192, 192, 0.9)',
+                'rgba(255, 99, 132, 0.9)',
+                'rgba(255, 159, 64, 0.9)',
+                'rgba(153, 102, 255, 0.9)',
+                'rgba(255, 159, 64, 0.9)',
+                'rgba(45, 149, 191, 0.9)',
+                'rgba(238, 130, 238, 0.9)'
+            ];
+            var borderColors = [
+                'rgb(54, 162, 235)',
+                'rgb(75, 192, 192)',
+                'rgb(255, 99, 132)',
+                'rgb(255, 206, 86)',
+                'rgb(153, 102, 255)',
+                'rgb(255, 159, 64)',
+                'rgb(45, 149, 191)',
+                'rgb(238, 130, 238)'
+            ];
+            
+            {% for option in question.options %}
+                {% set count = namespace(value=0) %}
+                {% for answer in answers %}
+                    {% if question.type == 'radio' %}
+                        {% if answer[question_index].answer == option %}
+                            {% set count.value = count.value + 1 %}
+                        {% endif %}
+                    {% elif question.type == 'checkbox' %}
+                        {% if answer[question_index].answer and option in answer[question_index].answer %}
+                            {% set count.value = count.value + 1 %}
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+                data{{ question_index }}.push({{ count.value }});
+            {% endfor %}
+            
+            // 创建图表 - 使用饼图而不是条形图
+            new Chart(ctx{{ question_index }}, {
+                type: {% if question.type == 'radio' %}'pie'{% else %}'bar'{% endif %},
+                data: {
+                    labels: labels{{ question_index }},
+                    datasets: [{
+                        label: '回答数量',
+                        data: data{{ question_index }},
+                        backgroundColor: backgroundColors.slice(0, labels{{ question_index }}.length),
+                        borderColor: borderColors.slice(0, labels{{ question_index }}.length),
+                        borderWidth: 2,
+                        {% if question.type == 'radio' %}
+                        hoverOffset: 8
+                        {% else %}
+                        hoverBackgroundColor: borderColors.slice(0, labels{{ question_index }}.length),
+                        maxBarThickness: 50,
+                        borderRadius: 4
+                        {% endif %}
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: {% if question.type == 'radio' %}'right'{% else %}'top'{% endif %},
+                            labels: {
+                                boxWidth: 15,
+                                padding: 15,
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                },
+                                usePointStyle: {% if question.type == 'radio' %}true{% else %}false{% endif %}
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            bodyFont: {
+                                size: 13
+                            },
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    let value = context.parsed;
+                                    if (context.parsed.y !== undefined) {
+                                        value = context.parsed.y;
+                                    }
+                                    let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    let percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                    return `${context.label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    {% if question.type == 'checkbox' %}
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                color: '#666',
+                                font: {
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#666',
+                                font: {
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                    {% endif %}
+                }
+            });
+        {% endif %}
+    {% endfor %}
+    
+    // 打印功能
+    document.getElementById('print-results').addEventListener('click', function() {
+        window.print();
+    });
+    
+    // 复制链接
+    {% if not answers %}
+    document.getElementById('copy-link').addEventListener('click', function() {
+        var linkToCopy = window.location.origin + '/form/{{ form.id }}';
+        navigator.clipboard.writeText(linkToCopy).then(function() {
+            showToast('链接已复制到剪贴板！', 'success');
+        }, function() {
+            showToast('复制失败，请手动复制链接', 'error');
+        });
+    });
+    {% endif %}
+    {% endif %}
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 微信分享功能
+    window.shareToWechat = function(event, url, title) {
+        event.preventDefault();
+        // 创建二维码模态框
+        const wechatModalHtml = `
+            <div class="modal fade" id="wechatShareModal" tabindex="-1" aria-labelledby="wechatShareModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="wechatShareModalLabel">微信分享</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <p>请使用微信扫描下方二维码分享</p>
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}" 
+                                 alt="微信分享二维码" class="img-fluid mb-2">
+                            <p class="small text-muted">或复制链接后在微信中粘贴</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // 添加模态框到页面
+        const modalContainer = document.createElement('div');
+        modalContainer.innerHTML = wechatModalHtml;
+        document.body.appendChild(modalContainer);
+        
+        // 显示模态框
+        const modal = new bootstrap.Modal(document.getElementById('wechatShareModal'));
+        modal.show();
+        
+        // 模态框关闭后移除
+        document.getElementById('wechatShareModal').addEventListener('hidden.bs.modal', function() {
+            document.body.removeChild(modalContainer);
+        });
+    };
+    
+    // 分享表单功能
+    document.getElementById('share-form-btn').addEventListener('click', function() {
+        const formId = '{{ form.id }}';
+        const formTitle = '{{ form.title }}';
+        const formUrl = `${window.location.origin}/form/${formId}`;
+        
+        // 创建模态框
+        const modalHtml = `
+            <div class="modal fade" id="shareFormModal" tabindex="-1" aria-labelledby="shareFormModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="shareFormModalLabel">分享 "${formTitle}" 表单</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>使用以下链接分享您的表单给其他人：</p>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="formShareLink" value="${formUrl}" readonly>
+                                <button class="btn btn-outline-primary fw-bold" type="button" id="copyShareLink">复制</button>
+                            </div>
+                            <div class="d-flex justify-content-center mt-4">
+                                <div class="btn-group share-buttons">
+                                    <a href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(formUrl)}" target="_blank" class="btn btn-outline-primary">
+                                        <i class="fas fa-qrcode me-1"></i> 显示二维码
+                                    </a>
+                                    <a href="https://connect.qq.com/widget/shareqq/index.html?url=${encodeURIComponent(formUrl)}&title=${encodeURIComponent(`请填写表单: ${formTitle}`)}&summary=${encodeURIComponent(`请填写此表单`)}" target="_blank" class="btn btn-outline-info">
+                                        <i class="fab fa-qq me-1"></i> QQ分享
+                                    </a>
+                                    <a href="https://wechat.com" onclick="shareToWechat(event, '${formUrl}', '${formTitle}')" class="btn btn-outline-success">
+                                        <i class="fab fa-weixin me-1"></i> 微信分享
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // 添加模态框到页面
+        const modalContainer = document.createElement('div');
+        modalContainer.innerHTML = modalHtml;
+        document.body.appendChild(modalContainer);
+        
+        // 显示模态框
+        const modal = new bootstrap.Modal(document.getElementById('shareFormModal'));
+        modal.show();
+        
+        // 复制链接功能
+        document.getElementById('copyShareLink').addEventListener('click', function() {
+            const shareLink = document.getElementById('formShareLink');
+            shareLink.select();
+            document.execCommand('copy');
+            
+            // 更改按钮文本显示已复制
+            this.innerHTML = '<i class="fas fa-check me-1"></i> 已复制';
+            setTimeout(() => {
+                this.innerHTML = '复制';
+            }, 2000);
+        });
+        
+        // 模态框关闭后移除
+        document.getElementById('shareFormModal').addEventListener('hidden.bs.modal', function() {
+            document.body.removeChild(modalContainer);
+        });
+    });
+    
+    // 显示提示函数
+    function showToast(message, type = 'info') {
+        // 创建toast元素
+        const toastContainer = document.createElement('div');
+        toastContainer.style.position = 'fixed';
+        toastContainer.style.top = '20px';
+        toastContainer.style.right = '20px';
+        toastContainer.style.zIndex = '1050';
+        
+        const toast = document.createElement('div');
+        toast.className = 'toast show';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        
+        let bgColor = 'bg-primary';
+        if (type === 'success') bgColor = 'bg-success';
+        if (type === 'error') bgColor = 'bg-danger';
+        
+        toast.innerHTML = `
+            <div class="toast-header ${bgColor} text-white">
+                <strong class="me-auto">${type === 'success' ? '成功' : type === 'error' ? '错误' : '提示'}</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        document.body.appendChild(toastContainer);
+        
+        // 3秒后自动关闭
+        setTimeout(() => {
+            document.body.removeChild(toastContainer);
+        }, 3000);
+    }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 导出Excel功能
+    document.getElementById('export-excel').addEventListener('click', function() {
+        window.location.href = '/export/{{ form.id }}';
+    });
+
+    // 使用此表单作为模板
+    document.getElementById('use-as-template').addEventListener('click', function() {
+        // 显示模板创建对话框
+        const templateModal = new bootstrap.Modal(document.getElementById('templateModal'));
+        templateModal.show();
+    });
+
+    // 创建基于模板的新表单
+    document.getElementById('create-template').addEventListener('click', function() {
+        const button = this;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 处理中...';
+        button.disabled = true;
+        
+        const title = document.getElementById('new-form-title').value;
+        
+        // 发送请求创建新表单
+        fetch('/api/duplicate_form/{{ form.id }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: title
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = data.redirect_url;
+            } else {
+                alert('创建失败: ' + (data.message || '未知错误'));
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('发生错误: ' + error);
+            button.innerHTML = originalText;
+            button.disabled = false;
+        });
+    });
+});
+</script>
+{% endblock %} 

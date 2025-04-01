@@ -1,0 +1,1131 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ form.title }} - 填写表单{% endblock %}
+
+{% block custom_styles %}
+.form-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.form-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(50%, -50%);
+}
+
+.form-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.form-description {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 800px;
+}
+
+.question-card {
+    border: none;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s, box-shadow 0.3s;
+    overflow: hidden;
+}
+
+.question-card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.question-card .card-body {
+    padding: 25px;
+}
+
+.question-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+}
+
+.required-badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    margin-left: 10px;
+    border-radius: 10px;
+}
+
+.question-type-icon {
+    width: 28px;
+    height: 28px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+}
+
+.textarea-question {
+    border-left: 3px solid #4361ee;
+}
+
+.radio-question {
+    border-left: 3px solid #3a86ff;
+}
+
+.checkbox-question {
+    border-left: 3px solid #4895ef;
+}
+
+.signature-question {
+    border-left: 3px solid #ff7e67;
+}
+
+.image-question {
+    border-left: 3px solid #38b000;
+}
+
+.signature-pad-container {
+    width: 100%;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    position: relative;
+    background-color: #fafafa;
+    touch-action: none;
+}
+
+.image-upload-container {
+    width: 100%;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    position: relative;
+    background-color: #fafafa;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.image-upload-container:hover {
+    border-color: #38b000;
+    background-color: rgba(56, 176, 0, 0.05);
+}
+
+.image-upload-preview {
+    max-width: 100%;
+    max-height: 300px;
+    margin-top: 15px;
+    border-radius: 8px;
+    display: none;
+}
+
+.image-upload-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+    gap: 10px;
+}
+
+.signature-pad {
+    width: 100%;
+    height: 200px;
+    background-color: #fff;
+    border-radius: 6px;
+}
+
+.custom-radio, .custom-checkbox {
+    margin-bottom: 10px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    transition: background-color 0.2s;
+}
+
+.custom-radio:hover, .custom-checkbox:hover {
+    background-color: rgba(67, 97, 238, 0.05);
+}
+
+.progress-container {
+    margin-bottom: 30px;
+}
+
+.progress {
+    height: 8px;
+    border-radius: 4px;
+}
+
+.form-actions {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.submit-btn {
+    min-width: 120px;
+}
+
+.question-card.is-invalid {
+    border: 1px solid #dc3545;
+    animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* 移动端适配样式 */
+@media (max-width: 767.98px) {
+    .form-header {
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+    }
+    
+    .form-title {
+        font-size: 1.5rem;
+    }
+    
+    .form-description {
+        font-size: 0.95rem;
+    }
+    
+    .question-card {
+        margin-bottom: 15px;
+    }
+    
+    .question-card .card-body {
+        padding: 15px;
+    }
+    
+    .question-title {
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+    }
+    
+    .question-type-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+    }
+    
+    .required-badge {
+        font-size: 0.65rem;
+        padding: 2px 6px;
+    }
+    
+    .signature-pad {
+        height: 150px;
+    }
+    
+    .image-upload-container {
+        padding: 15px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+    
+    .submit-btn {
+        order: -1; /* 确保提交按钮在手机上显示在最前面 */
+    }
+    
+    /* 增大单选和复选框的可点击区域 */
+    .form-check-label {
+        display: block;
+        padding: 10px 30px 10px 40px;
+        margin: -10px -15px -10px -40px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .form-check-input {
+        margin-top: 0.3rem;
+    }
+    
+    /* 优化固定在底部的提交按钮 */
+    .fixed-form-actions {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        padding: 10px 0;
+        box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.1);
+        margin: 0 -15px;
+        padding: 10px 15px;
+        z-index: 100;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .form-header {
+        padding: 15px;
+    }
+    
+    .form-title {
+        font-size: 1.3rem;
+    }
+    
+    .question-title {
+        font-size: 1rem;
+    }
+    
+    .custom-radio, .custom-checkbox {
+        padding: 8px 12px;
+    }
+    
+    /* 修改分享按钮布局 */
+    .share-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .share-buttons .btn {
+        margin-bottom: 5px;
+        width: 100%;
+    }
+}
+
+/* 优化触摸体验 */
+@media (hover: none) {
+    .custom-radio, .custom-checkbox {
+        background-color: rgba(67, 97, 238, 0.02);
+    }
+    
+    .custom-radio:active, .custom-checkbox:active {
+        background-color: rgba(67, 97, 238, 0.1);
+    }
+    
+    .question-card:hover {
+        transform: none;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    }
+}
+
+.auto-resize-textarea {
+    resize: none;
+    transition: height 0.2s ease-in-out, border-color 0.2s, background-color 0.2s;
+    border-left: 3px solid #4361ee;
+    padding: 10px 12px;
+    line-height: 1.5;
+}
+
+.auto-resize-textarea:focus {
+    box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.1);
+    border-color: #4361ee;
+    border-left-width: 3px;
+    background-color: #f8f9ff;
+}
+
+.auto-resize-textarea.has-content {
+    background-color: #f8f9ff;
+    border-color: #4361ee;
+}
+
+.auto-resize-textarea::placeholder {
+    color: #adb5bd;
+    opacity: 0.8;
+}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="form-header">
+            <h1 class="form-title">{{ form.title }}</h1>
+            {% if form.description %}
+            <p class="form-description">{{ form.description }}</p>
+            {% endif %}
+            <div class="d-flex justify-content-end mt-3">
+                <button class="btn btn-light" id="share-form-btn">
+                    <i class="fas fa-share-alt me-2"></i>分享表单
+                </button>
+            </div>
+        </div>
+        
+        <!-- 添加用户信息卡片 -->
+        <div class="card mb-4 user-info-card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-user-circle me-2 text-primary"></i>
+                    个人信息 <span class="text-muted small">(自动填充, 仅班级内部使用)</span>
+                </h5>
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                        <label for="qq_number" class="form-label">QQ号码</label>
+                        <input type="text" class="form-control" id="qq_number" placeholder="自动获取填表人QQ号">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="nickname" class="form-label">昵称</label>
+                        <input type="text" class="form-control" id="nickname" placeholder="自动获取填表人昵称">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="class_number" class="form-label">班级</label>
+                        <input type="text" class="form-control" id="class_number" placeholder="填写您的班级">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="student_id" class="form-label">学号</label>
+                        <input type="text" class="form-control" id="student_id" placeholder="填写您的学号">
+                    </div>
+                </div>
+                <div class="form-text mt-2">
+                    <i class="fas fa-info-circle me-1"></i> 这些信息将与您的回答一起提交，便于老师统计管理
+                </div>
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">填写进度</span>
+                <span class="fw-bold" id="progress-text">0%</span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar bg-primary" role="progressbar" 
+                     style="width: 0%" id="progress-bar"></div>
+            </div>
+        </div>
+        
+        <form id="submit-form" data-form-id="{{ form.id }}">
+            {% for question in questions %}
+            {% set question_index = loop.index0 %}
+            <div class="card question-card {% if question.type == 'text' %}textarea-question{% elif question.type == 'radio' %}radio-question{% elif question.type == 'checkbox' %}checkbox-question{% elif question.type == 'signature' %}signature-question{% elif question.type == 'image' %}image-question{% endif %}" 
+                 data-question-id="{{ question_index }}" 
+                 data-required="{{ question.required|lower }}">
+                <div class="card-body">
+                    <h5 class="question-title">
+                        {% if question.type == 'text' %}
+                        <span class="question-type-icon"><i class="fas fa-font"></i></span>
+                        {% elif question.type == 'radio' %}
+                        <span class="question-type-icon"><i class="fas fa-dot-circle"></i></span>
+                        {% elif question.type == 'checkbox' %}
+                        <span class="question-type-icon"><i class="fas fa-check-square"></i></span>
+                        {% elif question.type == 'signature' %}
+                        <span class="question-type-icon" style="background-color: #ff7e67;"><i class="fas fa-signature"></i></span>
+                        {% elif question.type == 'image' %}
+                        <span class="question-type-icon" style="background-color: #38b000;"><i class="fas fa-image"></i></span>
+                        {% endif %}
+                        {{ question.title }}
+                        {% if question.required %}
+                        <span class="badge bg-danger required-badge">必填</span>
+                        {% endif %}
+                    </h5>
+                    
+                    {% if question.type == 'text' %}
+                    <div class="mb-3">
+                        <textarea class="form-control question-answer auto-resize-textarea" rows="1" 
+                                  placeholder="请在此输入您的回答" style="min-height: 38px; overflow-y: hidden;"></textarea>
+                    </div>
+                    
+                    {% elif question.type == 'radio' %}
+                    <div class="mb-3">
+                        {% for option in question.options %}
+                        <div class="form-check custom-radio">
+                            <input class="form-check-input question-answer" type="radio" 
+                                   name="question-{{ question_index }}" 
+                                   id="q{{ question_index }}-option-{{ loop.index0 }}" 
+                                   value="{{ option }}">
+                            <label class="form-check-label" for="q{{ question_index }}-option-{{ loop.index0 }}">
+                                {{ option }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    {% elif question.type == 'checkbox' %}
+                    <div class="mb-3">
+                        {% for option in question.options %}
+                        <div class="form-check custom-checkbox">
+                            <input class="form-check-input question-answer" type="checkbox" 
+                                   name="question-{{ question_index }}" 
+                                   id="q{{ question_index }}-option-{{ loop.index0 }}" 
+                                   value="{{ option }}">
+                            <label class="form-check-label" for="q{{ question_index }}-option-{{ loop.index0 }}">
+                                {{ option }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    {% elif question.type == 'signature' %}
+                    <div class="mb-3">
+                        <div class="signature-pad-container">
+                            <canvas class="signature-pad question-answer" id="signature-pad-{{ question_index }}"></canvas>
+                        </div>
+                        <div class="signature-pad-actions">
+                            <button type="button" class="btn btn-sm btn-outline-secondary clear-signature" data-pad-id="{{ question_index }}">
+                                <i class="fas fa-eraser me-1"></i>清除
+                            </button>
+                        </div>
+                        <input type="hidden" id="signature-data-{{ question_index }}" class="signature-data">
+                    </div>
+                    
+                    {% elif question.type == 'image' %}
+                    <div class="mb-3">
+                        <div class="image-upload-container" id="image-container-{{ question_index }}">
+                            <label for="image-upload-{{ question_index }}" class="d-block">
+                                <div class="upload-icon mb-2">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted"></i>
+                                </div>
+                                <p class="mb-1">点击或拖放图片到这里上传</p>
+                                <p class="text-muted small">支持JPG、PNG、GIF等格式</p>
+                            </label>
+                            <input type="file" id="image-upload-{{ question_index }}" accept="image/*" 
+                                   class="image-upload d-none" data-question-id="{{ question_index }}">
+                            <img src="" class="image-upload-preview" id="image-preview-{{ question_index }}">
+                        </div>
+                        <div class="image-upload-actions">
+                            <button type="button" class="btn btn-sm btn-outline-secondary remove-image" data-image-id="{{ question_index }}" style="display: none;">
+                                <i class="fas fa-trash me-1"></i>移除图片
+                            </button>
+                        </div>
+                        <input type="hidden" id="image-data-{{ question_index }}" class="image-data">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='/'">
+                    <i class="fas fa-arrow-left me-1"></i> 返回首页
+                </button>
+                <button type="button" class="btn btn-primary btn-lg submit-btn" id="submit-button">
+                    <i class="fas fa-paper-plane me-1"></i> 提交回答
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="submissionSuccessModal" tabindex="-1" aria-labelledby="submissionSuccessModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="submissionSuccessModalLabel">提交成功</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                <h4>表单已成功提交！</h4>
+                <p class="mb-0">感谢您的参与，您的回答已记录。</p>
+                <p class="text-muted mt-3">您可以随时查看、编辑或删除您的回答。</p>
+                <div class="mt-3">
+                    <a href="/my-responses" class="btn btn-outline-primary me-2">查看我的回答</a>
+                    <a href="/" class="btn btn-outline-secondary">返回首页</a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="closeSuccessModalBtn">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const formId = document.getElementById('submit-form').getAttribute('data-form-id');
+    const questionCards = document.querySelectorAll('.question-card');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    
+    // 尝试从URL参数中获取QQ用户信息
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('qq')) {
+            document.getElementById('qq_number').value = urlParams.get('qq');
+        }
+        if (urlParams.has('nickname')) {
+            document.getElementById('nickname').value = decodeURIComponent(urlParams.get('nickname'));
+        }
+    } catch (e) {
+        console.error("无法从URL获取用户信息:", e);
+    }
+    
+    // 尝试从localStorage获取之前填写的班级和学号信息
+    if (localStorage.getItem('class_number')) {
+        document.getElementById('class_number').value = localStorage.getItem('class_number');
+    }
+    if (localStorage.getItem('student_id')) {
+        document.getElementById('student_id').value = localStorage.getItem('student_id');
+    }
+    
+    // 保存班级和学号信息到localStorage
+    document.getElementById('class_number').addEventListener('change', function() {
+        localStorage.setItem('class_number', this.value);
+    });
+    document.getElementById('student_id').addEventListener('change', function() {
+        localStorage.setItem('student_id', this.value);
+    });
+    
+    // 初始化自动调整文本框高度
+    document.querySelectorAll('.auto-resize-textarea').forEach(textarea => {
+        // 确保文本框初始状态是单行高度
+        textarea.setAttribute('style', 'min-height: 38px; height: 38px; overflow-y: hidden;');
+        
+        // 设置输入时的高度自动调整
+        const adjustHeight = () => {
+            // 重置高度，然后根据内容设置新高度
+            textarea.style.height = 'auto';
+            const newHeight = Math.max(38, textarea.scrollHeight);
+            textarea.style.height = newHeight + 'px';
+            
+            // 添加或移除活动类
+            if (textarea.value.trim() !== '') {
+                textarea.classList.add('has-content');
+            } else {
+                textarea.classList.remove('has-content');
+            }
+        };
+        
+        // 注册事件
+        textarea.addEventListener('input', adjustHeight);
+        textarea.addEventListener('focus', adjustHeight);
+        textarea.addEventListener('blur', adjustHeight);
+        
+        // 窗口大小改变时重新调整
+        window.addEventListener('resize', adjustHeight);
+        
+        // 初始调用一次以确保正确高度
+        setTimeout(adjustHeight, 100);
+    });
+    
+    // 初始化签名板
+    const signaturePads = [];
+    document.querySelectorAll('.signature-pad').forEach(canvas => {
+        const padId = canvas.id.split('-').pop();
+        const signaturePad = new SignaturePad(canvas, {
+            backgroundColor: 'rgba(255, 255, 255, 0)',
+            penColor: 'rgb(0, 0, 0)'
+        });
+        
+        // 调整签名板尺寸以适应容器
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+            signaturePad.clear(); // 清除签名板内容
+        }
+        
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+        
+        // 当签名时更新隐藏输入值和进度
+        signaturePad.addEventListener("endStroke", () => {
+            document.getElementById(`signature-data-${padId}`).value = signaturePad.toDataURL();
+            updateProgress();
+        });
+        
+        signaturePads[padId] = signaturePad;
+    });
+    
+    // 清除签名按钮
+    document.querySelectorAll('.clear-signature').forEach(button => {
+        button.addEventListener('click', function() {
+            const padId = this.getAttribute('data-pad-id');
+            signaturePads[padId].clear();
+            document.getElementById(`signature-data-${padId}`).value = '';
+            updateProgress();
+        });
+    });
+    
+    // 处理图片上传
+    document.querySelectorAll('.image-upload').forEach(input => {
+        const questionId = input.getAttribute('data-question-id');
+        const previewElement = document.getElementById(`image-preview-${questionId}`);
+        const removeButton = document.querySelector(`.remove-image[data-image-id="${questionId}"]`);
+        const imageDataInput = document.getElementById(`image-data-${questionId}`);
+        const container = document.getElementById(`image-container-${questionId}`);
+        
+        // 处理文件选择
+        input.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                // 检查文件类型
+                if (!file.type.match('image.*')) {
+                    showToast('请选择图片文件（JPG, PNG, GIF等）', 'error');
+                    return;
+                }
+                
+                // 检查文件大小，限制为5MB
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('图片大小不能超过5MB', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    // 显示预览
+                    previewElement.src = e.target.result;
+                    previewElement.style.display = 'block';
+                    // 保存图片数据
+                    imageDataInput.value = e.target.result;
+                    // 显示移除按钮
+                    removeButton.style.display = 'block';
+                    // 更新进度
+                    updateProgress();
+                    // 修改容器样式
+                    container.style.padding = '10px';
+                    container.querySelector('label').style.display = 'none';
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // 处理图片移除
+        removeButton.addEventListener('click', function() {
+            // 清除预览
+            previewElement.src = '';
+            previewElement.style.display = 'none';
+            // 清除图片数据
+            imageDataInput.value = '';
+            // 重置输入字段
+            input.value = '';
+            // 隐藏移除按钮
+            removeButton.style.display = 'none';
+            // 还原容器样式
+            container.style.padding = '20px';
+            container.querySelector('label').style.display = 'block';
+            // 更新进度
+            updateProgress();
+        });
+        
+        // 支持拖放上传
+        container.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.style.borderColor = '#38b000';
+            this.style.backgroundColor = 'rgba(56, 176, 0, 0.1)';
+        });
+        
+        container.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.style.borderColor = '#ddd';
+            this.style.backgroundColor = '#fafafa';
+        });
+        
+        container.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.style.borderColor = '#ddd';
+            this.style.backgroundColor = '#fafafa';
+            
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                input.files = e.dataTransfer.files;
+                const event = new Event('change', { bubbles: true });
+                input.dispatchEvent(event);
+            }
+        });
+    });
+    
+    // 实时更新进度条
+    function updateProgress() {
+        let totalQuestions = questionCards.length;
+        let answeredQuestions = 0;
+        
+        questionCards.forEach(card => {
+            let isAnswered = false;
+            
+            if (card.querySelector('textarea')) {
+                isAnswered = card.querySelector('textarea').value.trim() !== '';
+            } else if (card.querySelectorAll('input[type="radio"]').length > 0) {
+                isAnswered = card.querySelector('input[type="radio"]:checked') !== null;
+            } else if (card.querySelectorAll('input[type="checkbox"]').length > 0) {
+                isAnswered = card.querySelector('input[type="checkbox"]:checked') !== null;
+            } else if (card.querySelector('.signature-pad')) {
+                const padId = card.getAttribute('data-question-id');
+                isAnswered = document.getElementById(`signature-data-${padId}`).value !== '';
+            } else if (card.querySelector('.image-upload')) {
+                const imageId = card.getAttribute('data-question-id');
+                isAnswered = document.getElementById(`image-data-${imageId}`).value !== '';
+            }
+            
+            if (isAnswered) {
+                answeredQuestions++;
+            }
+        });
+        
+        let progressPercentage = totalQuestions > 0 ? Math.round((answeredQuestions / totalQuestions) * 100) : 0;
+        progressBar.style.width = progressPercentage + '%';
+        progressText.textContent = progressPercentage + '%';
+    }
+    
+    // 添加输入事件监听
+    questionCards.forEach(card => {
+        let inputs = card.querySelectorAll('textarea, input:not([type="file"])');
+        inputs.forEach(input => {
+            input.addEventListener('input', updateProgress);
+            input.addEventListener('change', updateProgress);
+        });
+    });
+    
+    document.getElementById('submit-button').addEventListener('click', function() {
+        submitForm();
+    });
+    
+    function submitForm() {
+        const answers = [];
+        let valid = true;
+        
+        // 移除之前的错误标记
+        document.querySelectorAll('.is-invalid').forEach(el => {
+            el.classList.remove('is-invalid');
+        });
+        
+        // 移除卡片的错误样式
+        questionCards.forEach(card => {
+            card.classList.remove('is-invalid');
+        });
+        
+        // 收集所有回答
+        questionCards.forEach(card => {
+            const questionId = card.getAttribute('data-question-id');
+            const required = card.getAttribute('data-required') === 'true';
+            
+            let answer = null;
+            
+            // 根据问题类型获取答案
+            if (card.querySelector('textarea')) {
+                // 文本题
+                const textarea = card.querySelector('textarea');
+                answer = textarea.value.trim();
+                
+                if (required && !answer) {
+                    textarea.classList.add('is-invalid');
+                    card.classList.add('is-invalid');
+                    valid = false;
+                }
+            } else if (card.querySelectorAll('input[type="radio"]').length > 0) {
+                // 单选题
+                const selectedOption = card.querySelector('input[type="radio"]:checked');
+                
+                if (selectedOption) {
+                    answer = selectedOption.value;
+                } else if (required) {
+                    card.querySelectorAll('input[type="radio"]').forEach(radio => {
+                        radio.classList.add('is-invalid');
+                    });
+                    card.classList.add('is-invalid');
+                    valid = false;
+                }
+            } else if (card.querySelectorAll('input[type="checkbox"]').length > 0) {
+                // 多选题
+                const selectedOptions = card.querySelectorAll('input[type="checkbox"]:checked');
+                
+                if (selectedOptions.length > 0) {
+                    answer = Array.from(selectedOptions).map(opt => opt.value);
+                } else if (required) {
+                    card.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                        checkbox.classList.add('is-invalid');
+                    });
+                    card.classList.add('is-invalid');
+                    valid = false;
+                }
+            } else if (card.querySelector('.signature-pad')) {
+                // 签名题
+                const signatureData = document.getElementById(`signature-data-${questionId}`).value;
+                answer = signatureData;
+                
+                if (required && !signatureData) {
+                    card.querySelector('.signature-pad-container').classList.add('is-invalid');
+                    card.classList.add('is-invalid');
+                    valid = false;
+                }
+            } else if (card.querySelector('.image-upload')) {
+                // 图片题
+                const imageData = document.getElementById(`image-data-${questionId}`).value;
+                answer = imageData;
+                
+                if (required && !imageData) {
+                    card.querySelector('.image-upload-container').classList.add('is-invalid');
+                    card.classList.add('is-invalid');
+                    valid = false;
+                }
+            }
+            
+            answers.push({
+                question_id: parseInt(questionId),
+                answer: answer
+            });
+        });
+        
+        // 获取用户信息
+        const userInfo = {
+            qq_number: document.getElementById('qq_number').value.trim(),
+            nickname: document.getElementById('nickname').value.trim(),
+            class_number: document.getElementById('class_number').value.trim(),
+            student_id: document.getElementById('student_id').value.trim()
+        };
+        
+        if (!valid) {
+            showToast('请填写所有必填项！', 'error');
+            
+            // 滚动到第一个错误项
+            const firstInvalidCard = document.querySelector('.question-card.is-invalid');
+            if (firstInvalidCard) {
+                firstInvalidCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return;
+        }
+        
+        // 显示加载状态
+        const submitBtn = document.getElementById('submit-button');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 提交中...';
+        submitBtn.disabled = true;
+        
+        // 发送到服务器，包含用户信息
+        fetch(`/api/submit/${formId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                answers: answers,
+                user_info: userInfo
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 重置表单状态
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                
+                // 记录提交的表单ID，以便之后编辑或查看
+                localStorage.setItem('last_response_id', data.response_id);
+                
+                // 显示成功消息
+                showToast('提交成功！感谢您的参与。', 'success');
+                
+                // 直接跳转到首页
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1500);
+            } else {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                showToast('提交失败：' + (data.message || '未知错误'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            showToast('发生错误：' + error, 'error');
+        });
+    }
+    
+    // 显示提示函数
+    function showToast(message, type = 'info') {
+        // 创建toast元素
+        const toastContainer = document.createElement('div');
+        toastContainer.style.position = 'fixed';
+        toastContainer.style.top = '20px';
+        toastContainer.style.right = '20px';
+        toastContainer.style.zIndex = '1050';
+        
+        const toast = document.createElement('div');
+        toast.className = 'toast show';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        
+        let bgColor = 'bg-primary';
+        if (type === 'success') bgColor = 'bg-success';
+        if (type === 'error') bgColor = 'bg-danger';
+        
+        toast.innerHTML = `
+            <div class="toast-header ${bgColor} text-white">
+                <strong class="me-auto">${type === 'success' ? '成功' : type === 'error' ? '错误' : '提示'}</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        document.body.appendChild(toastContainer);
+        
+        // 3秒后自动关闭
+        setTimeout(() => {
+            document.body.removeChild(toastContainer);
+        }, 3000);
+    }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 微信分享功能
+    window.shareToWechat = function(event, url, title) {
+        event.preventDefault();
+        // 创建二维码模态框
+        const wechatModalHtml = `
+            <div class="modal fade" id="wechatShareModal" tabindex="-1" aria-labelledby="wechatShareModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="wechatShareModalLabel">微信分享</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <p>请使用微信扫描下方二维码分享</p>
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}" 
+                                 alt="微信分享二维码" class="img-fluid mb-2">
+                            <p class="small text-muted">或复制链接后在微信中粘贴</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // 添加模态框到页面
+        const modalContainer = document.createElement('div');
+        modalContainer.innerHTML = wechatModalHtml;
+        document.body.appendChild(modalContainer);
+        
+        // 显示模态框
+        const modal = new bootstrap.Modal(document.getElementById('wechatShareModal'));
+        modal.show();
+        
+        // 模态框关闭后移除
+        document.getElementById('wechatShareModal').addEventListener('hidden.bs.modal', function() {
+            document.body.removeChild(modalContainer);
+        });
+    };
+    
+    // 分享表单功能
+    document.getElementById('share-form-btn').addEventListener('click', function() {
+        const formId = document.getElementById('submit-form').getAttribute('data-form-id');
+        const formTitle = document.querySelector('.form-title').textContent;
+        const formUrl = window.location.href;
+        
+        // 创建模态框
+        const modalHtml = `
+            <div class="modal fade" id="shareFormModal" tabindex="-1" aria-labelledby="shareFormModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="shareFormModalLabel">分享表单</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>使用以下链接分享这个表单给其他人：</p>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="formShareLink" value="${formUrl}" readonly>
+                                <button class="btn btn-outline-primary" type="button" id="copyShareLink">复制</button>
+                            </div>
+                            <div class="mt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="enableQQParams" checked>
+                                    <label class="form-check-label" for="enableQQParams">
+                                        在QQ分享中自动获取用户信息
+                                    </label>
+                                    <small class="form-text text-muted d-block mt-1">
+                                        <i class="fas fa-info-circle me-1"></i> 勾选此项会自动获取填表人的QQ信息，填表更方便
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-center mt-4">
+                                <div class="btn-group share-buttons">
+                                    <a href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(formUrl)}" target="_blank" class="btn btn-outline-primary">
+                                        <i class="fas fa-qrcode me-1"></i> 显示二维码
+                                    </a>
+                                    <a href="#" id="qq-share-btn" class="btn btn-outline-info">
+                                        <i class="fab fa-qq me-1"></i> QQ分享
+                                    </a>
+                                    <a href="javascript:void(0)" onclick="shareToWechat(event, '${formUrl}', '${formTitle}')" class="btn btn-outline-success">
+                                        <i class="fab fa-weixin me-1"></i> 微信分享
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // 添加模态框到页面
+        const modalContainer = document.createElement('div');
+        modalContainer.innerHTML = modalHtml;
+        document.body.appendChild(modalContainer);
+        
+        // 显示模态框
+        const modal = new bootstrap.Modal(document.getElementById('shareFormModal'));
+        modal.show();
+        
+        // QQ分享功能
+        document.getElementById('qq-share-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            let shareUrl = formUrl;
+            
+            // 如果启用了QQ参数
+            if (document.getElementById('enableQQParams').checked) {
+                // 添加参数标记，表示这是QQ分享链接
+                shareUrl = formUrl + (formUrl.includes('?') ? '&' : '?') + 'qq_share=true';
+            }
+            
+            // 打开QQ分享链接
+            window.open(`https://connect.qq.com/widget/shareqq/index.html?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(`请填写表单: ${formTitle}`)}&summary=${encodeURIComponent('请填写此表单')}`, '_blank');
+        });
+        
+        // 复制链接功能
+        document.getElementById('copyShareLink').addEventListener('click', function() {
+            const shareLink = document.getElementById('formShareLink');
+            shareLink.select();
+            document.execCommand('copy');
+            
+            // 更改按钮文本显示已复制
+            this.innerHTML = '<i class="fas fa-check me-1"></i> 已复制';
+            setTimeout(() => {
+                this.innerHTML = '复制';
+            }, 2000);
+        });
+        
+        // 模态框关闭后移除
+        document.getElementById('shareFormModal').addEventListener('hidden.bs.modal', function() {
+            document.body.removeChild(modalContainer);
+        });
+    });
+});
+</script>
+{% endblock %} 

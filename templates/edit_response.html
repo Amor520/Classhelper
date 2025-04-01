@@ -1,0 +1,210 @@
+{% extends 'layout.html' %}
+
+{% block title %}编辑回答 - {{ form.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">编辑回答 - {{ form.title }}</h1>
+    <p class="text-muted">{{ form.description }}</p>
+
+    <div class="mb-3">
+        <a href="{{ url_for('view_response', response_id=response.id) }}" class="btn btn-outline-secondary">返回查看</a>
+    </div>
+
+    <form id="editResponseForm">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">填写信息</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="qq_number" class="form-label">QQ号</label>
+                        <input type="text" class="form-control" id="qq_number" name="qq_number" 
+                               value="{{ user_info.qq_number if user_info else '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="nickname" class="form-label">昵称</label>
+                        <input type="text" class="form-control" id="nickname" name="nickname" 
+                               value="{{ user_info.nickname if user_info else '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="class_number" class="form-label">班级</label>
+                        <input type="text" class="form-control" id="class_number" name="class_number" 
+                               value="{{ user_info.class_number if user_info else '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="student_id" class="form-label">学号</label>
+                        <input type="text" class="form-control" id="student_id" name="student_id" 
+                               value="{{ user_info.student_id if user_info else '' }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">问题回答</h5>
+            </div>
+            <div class="card-body">
+                {% for question, answer in zip(questions, answers) %}
+                <div class="mb-4 question-container" data-question-id="{{ loop.index0 }}">
+                    <h5>{{ question.title }}</h5>
+                    {% if question.type == 'text' %}
+                    <input type="text" class="form-control answer-input" data-type="text" 
+                           value="{{ answer.answer or '' }}">
+                    
+                    {% elif question.type == 'textarea' %}
+                    <textarea class="form-control answer-input" data-type="textarea" rows="3">{{ answer.answer or '' }}</textarea>
+                    
+                    {% elif question.type == 'radio' %}
+                    <div class="mt-2">
+                        {% for option in question.options %}
+                        <div class="form-check">
+                            <input class="form-check-input radio-option" type="radio" 
+                                   name="radio_{{ loop.parent.loop.index0 }}" 
+                                   value="{{ option }}"
+                                   {% if answer.answer == option %}checked{% endif %}>
+                            <label class="form-check-label">{{ option }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    {% elif question.type == 'checkbox' %}
+                    <div class="mt-2">
+                        {% for option in question.options %}
+                        <div class="form-check">
+                            <input class="form-check-input checkbox-option" type="checkbox" 
+                                   name="checkbox_{{ loop.parent.loop.index0 }}_{{ loop.index0 }}" 
+                                   value="{{ option }}"
+                                   {% if answer.answer and option in answer.answer %}checked{% endif %}>
+                            <label class="form-check-label">{{ option }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="mt-4 mb-5">
+            <button type="submit" class="btn btn-primary" id="saveButton">保存修改</button>
+            <a href="{{ url_for('view_response', response_id=response.id) }}" class="btn btn-outline-secondary">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('editResponseForm');
+        const saveButton = document.getElementById('saveButton');
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 显示加载状态
+            saveButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 保存中...';
+            saveButton.disabled = true;
+            
+            // 构建用户信息数据
+            const userInfo = {
+                qq_number: document.getElementById('qq_number').value,
+                nickname: document.getElementById('nickname').value,
+                class_number: document.getElementById('class_number').value,
+                student_id: document.getElementById('student_id').value
+            };
+            
+            // 构建回答数据
+            const answers = [];
+            const questionContainers = document.querySelectorAll('.question-container');
+            
+            questionContainers.forEach(container => {
+                const questionId = container.dataset.questionId;
+                let answer = null;
+                
+                // 根据不同类型获取答案
+                if (container.querySelector('.answer-input[data-type="text"]')) {
+                    answer = container.querySelector('.answer-input[data-type="text"]').value;
+                } 
+                else if (container.querySelector('.answer-input[data-type="textarea"]')) {
+                    answer = container.querySelector('.answer-input[data-type="textarea"]').value;
+                }
+                else if (container.querySelectorAll('.radio-option').length > 0) {
+                    const selectedRadio = container.querySelector('.radio-option:checked');
+                    if (selectedRadio) {
+                        answer = selectedRadio.value;
+                    }
+                }
+                else if (container.querySelectorAll('.checkbox-option').length > 0) {
+                    answer = [];
+                    container.querySelectorAll('.checkbox-option:checked').forEach(checkbox => {
+                        answer.push(checkbox.value);
+                    });
+                    
+                    if (answer.length === 0) {
+                        answer = null;
+                    }
+                }
+                
+                answers.push({answer: answer});
+            });
+            
+            // 发送更新请求
+            fetch('/api/update-response/{{ response.id }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    answers: answers,
+                    user_info: userInfo
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 显示成功提示
+                    const toastContainer = document.createElement('div');
+                    toastContainer.style.position = 'fixed';
+                    toastContainer.style.top = '20px';
+                    toastContainer.style.right = '20px';
+                    toastContainer.style.zIndex = '1050';
+                    
+                    const toast = document.createElement('div');
+                    toast.className = 'toast show';
+                    toast.setAttribute('role', 'alert');
+                    toast.innerHTML = `
+                        <div class="toast-header bg-success text-white">
+                            <strong class="me-auto">成功</strong>
+                        </div>
+                        <div class="toast-body">
+                            您的回答已成功更新！
+                        </div>
+                    `;
+                    
+                    toastContainer.appendChild(toast);
+                    document.body.appendChild(toastContainer);
+                    
+                    // 1秒后跳转到查看页面
+                    setTimeout(() => {
+                        window.location.href = "{{ url_for('view_response', response_id=response.id) }}";
+                    }, 1000);
+                } else {
+                    alert(data.message || '保存失败，请重试');
+                    saveButton.innerHTML = '保存修改';
+                    saveButton.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('保存操作出错，请重试');
+                saveButton.innerHTML = '保存修改';
+                saveButton.disabled = false;
+            });
+        });
+    });
+</script>
+{% endblock %} 

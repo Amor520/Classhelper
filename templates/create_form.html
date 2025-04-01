@@ -1,0 +1,742 @@
+{% extends "layout.html" %}
+
+{% block title %}收集表系统 - 创建表单{% endblock %}
+
+{% block custom_styles %}
+.form-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+}
+
+.question-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+.question-card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.question-card.text-type {
+    border-left-color: #4361ee;
+}
+
+.question-card.radio-type {
+    border-left-color: #3a86ff;
+}
+
+.question-card.checkbox-type {
+    border-left-color: #4895ef;
+}
+
+.question-card.signature-type {
+    border-left-color: #ff7e67;
+}
+
+.question-card.image-type {
+    border-left-color: #38b000;
+}
+
+.delete-question {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #f8f9fa;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.delete-question:hover {
+    background-color: #ff4d6d;
+    color: white;
+}
+
+.option-row {
+    margin-bottom: 10px;
+    transition: all 0.2s;
+}
+
+.option-row:hover {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding-left: 5px;
+}
+
+.type-badge {
+    position: absolute;
+    right: 50px;
+    top: 15px;
+    font-size: 0.8rem;
+    padding: 3px 10px;
+}
+
+.question-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.required-toggle {
+    margin-left: auto;
+}
+
+.add-question-section {
+    margin-top: 30px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.question-type-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.question-type-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: white;
+}
+
+.text-icon {
+    background-color: #4361ee;
+}
+
+.radio-icon {
+    background-color: #3a86ff;
+}
+
+.checkbox-icon {
+    background-color: #4895ef;
+}
+
+.signature-icon {
+    background-color: #ff7e67;
+}
+
+.image-icon {
+    background-color: #38b000;
+}
+
+.empty-questions {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: white;
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+.form-actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.question-counter {
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 offset-md-1">
+        <div class="form-header">
+            <h1 class="mb-3"><i class="fas fa-edit me-2"></i>创建新表单</h1>
+            <p class="mb-0">设计您的问题，收集需要的信息。支持文本题、单选题和多选题。</p>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <form id="create-form">
+                    <div class="mb-4">
+                        <label for="form-title" class="form-label">表单标题</label>
+                        <input type="text" class="form-control form-control-lg" id="form-title" 
+                               placeholder="例如：员工满意度调查" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="form-description" class="form-label">表单描述（可选）</label>
+                        <textarea class="form-control" id="form-description" rows="3" 
+                                  placeholder="提供有关此表单的更多信息，帮助填写者了解目的"></textarea>
+                    </div>
+                    
+                    <div class="alert alert-info d-flex align-items-center" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <div>
+                            请添加问题来设计您的表单。每个问题可以选择不同的题型。
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3><i class="fas fa-list me-2"></i>问题列表</h3>
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-plus me-2"></i>添加问题
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item question-type-btn" href="#" data-type="text">
+                            <span class="question-type-icon text-icon"><i class="fas fa-font"></i></span>
+                            文本题
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item question-type-btn" href="#" data-type="radio">
+                            <span class="question-type-icon radio-icon"><i class="fas fa-dot-circle"></i></span>
+                            单选题
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item question-type-btn" href="#" data-type="checkbox">
+                            <span class="question-type-icon checkbox-icon"><i class="fas fa-check-square"></i></span>
+                            多选题
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item question-type-btn" href="#" data-type="signature">
+                            <span class="question-type-icon signature-icon"><i class="fas fa-signature"></i></span>
+                            电子签名
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item question-type-btn" href="#" data-type="image">
+                            <span class="question-type-icon image-icon"><i class="fas fa-image"></i></span>
+                            图片上传
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="questions-container">
+            <!-- 问题卡片将通过JavaScript动态添加 -->
+        </div>
+        
+        <div id="empty-questions" class="empty-questions">
+            <i class="fas fa-list-ul fa-3x text-muted mb-3"></i>
+            <h4>没有问题</h4>
+            <p class="text-muted">使用下方按钮添加不同类型的问题</p>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-plus-circle me-2"></i>添加问题</h5>
+                <div class="add-question-section">
+                    <button type="button" class="btn btn-outline-primary add-question-btn" data-type="text">
+                        <div class="question-type-icon text-icon me-1"><i class="fas fa-font"></i></div>
+                        文本题
+                    </button>
+                    <button type="button" class="btn btn-outline-primary add-question-btn" data-type="radio">
+                        <div class="question-type-icon radio-icon me-1"><i class="fas fa-dot-circle"></i></div>
+                        单选题
+                    </button>
+                    <button type="button" class="btn btn-outline-primary add-question-btn" data-type="checkbox">
+                        <div class="question-type-icon checkbox-icon me-1"><i class="fas fa-check-square"></i></div>
+                        多选题
+                    </button>
+                    <button type="button" class="btn btn-outline-primary add-question-btn" data-type="signature">
+                        <div class="question-type-icon signature-icon me-1"><i class="fas fa-signature"></i></div>
+                        签名题
+                    </button>
+                    <button type="button" class="btn btn-outline-primary add-question-btn" data-type="image">
+                        <div class="question-type-icon image-icon me-1"><i class="fas fa-image"></i></div>
+                        图片题
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <a href="/admin/dashboard" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> 返回仪表板
+            </a>
+            <button type="button" class="btn btn-primary" id="submit-form-btn">
+                <i class="fas fa-save me-1"></i> 保存表单
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 问题模板 -->
+<template id="text-question-template">
+    <div class="question-card text-type" data-type="text">
+        <span class="question-counter">{num}</span>
+        <span class="badge bg-primary type-badge">文本题</span>
+        <button type="button" class="delete-question btn-close" aria-label="删除"></button>
+        <div class="mb-3">
+            <label class="form-label">问题文本</label>
+            <input type="text" class="form-control question-title" placeholder="请输入问题文本，例如：您对我们的服务有什么建议？">
+        </div>
+        <div class="question-controls">
+            <div class="form-check form-switch required-toggle">
+                <input class="form-check-input question-required" type="checkbox" id="required-{id}">
+                <label class="form-check-label" for="required-{id}">
+                    必填项
+                </label>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="radio-question-template">
+    <div class="question-card radio-type" data-type="radio">
+        <span class="question-counter">{num}</span>
+        <span class="badge bg-info type-badge">单选题</span>
+        <button type="button" class="delete-question btn-close" aria-label="删除"></button>
+        <div class="mb-3">
+            <label class="form-label">问题文本</label>
+            <input type="text" class="form-control question-title" placeholder="请输入问题文本，例如：您最常使用我们产品的频率是？">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">选项</label>
+            <div class="options-container">
+                <div class="option-row d-flex">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-circle"></i></span>
+                        <input type="text" class="form-control option-text" placeholder="选项 1">
+                    </div>
+                    <button type="button" class="btn btn-outline-danger ms-2 delete-option">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <button type="button" class="btn btn-outline-primary btn-sm mt-3 add-option">
+                <i class="fas fa-plus me-1"></i>添加选项
+            </button>
+        </div>
+        <div class="question-controls">
+            <div class="form-check form-switch required-toggle">
+                <input class="form-check-input question-required" type="checkbox" id="required-{id}">
+                <label class="form-check-label" for="required-{id}">
+                    必填项
+                </label>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="checkbox-question-template">
+    <div class="question-card checkbox-type" data-type="checkbox">
+        <span class="question-counter">{num}</span>
+        <span class="badge bg-success type-badge">多选题</span>
+        <button type="button" class="delete-question btn-close" aria-label="删除"></button>
+        <div class="mb-3">
+            <label class="form-label">问题文本</label>
+            <input type="text" class="form-control question-title" placeholder="请输入问题文本，例如：您喜欢我们产品的哪些功能？">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">选项</label>
+            <div class="options-container">
+                <div class="option-row d-flex">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-check-square"></i></span>
+                        <input type="text" class="form-control option-text" placeholder="选项 1">
+                    </div>
+                    <button type="button" class="btn btn-outline-danger ms-2 delete-option">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <button type="button" class="btn btn-outline-primary btn-sm mt-3 add-option">
+                <i class="fas fa-plus me-1"></i>添加选项
+            </button>
+        </div>
+        <div class="question-controls">
+            <div class="form-check form-switch required-toggle">
+                <input class="form-check-input question-required" type="checkbox" id="required-{id}">
+                <label class="form-check-label" for="required-{id}">
+                    必填项
+                </label>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="option-template">
+    <div class="option-row d-flex">
+        <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-circle"></i></span>
+            <input type="text" class="form-control option-text" placeholder="新选项">
+        </div>
+        <button type="button" class="btn btn-outline-danger ms-2 delete-option">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</template>
+
+<template id="checkbox-option-template">
+    <div class="option-row d-flex">
+        <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-check-square"></i></span>
+            <input type="text" class="form-control option-text" placeholder="新选项">
+        </div>
+        <button type="button" class="btn btn-outline-danger ms-2 delete-option">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</template>
+
+<template id="signature-question-template">
+    <div class="question-card signature-type" data-type="signature">
+        <span class="question-counter">{num}</span>
+        <span class="badge bg-warning type-badge">电子签名</span>
+        <button type="button" class="delete-question btn-close" aria-label="删除"></button>
+        <div class="mb-3">
+            <label class="form-label">问题文本</label>
+            <input type="text" class="form-control question-title" placeholder="请输入问题文本，例如：请在此处签名以确认您已阅读以上条款">
+        </div>
+        <div class="mb-3">
+            <div class="form-text text-muted">
+                <i class="fas fa-info-circle me-1"></i>用户可以在表单填写页面通过鼠标或触屏进行签名
+            </div>
+        </div>
+        <div class="question-controls">
+            <div class="form-check form-switch required-toggle">
+                <input class="form-check-input question-required" type="checkbox" id="required-{id}">
+                <label class="form-check-label" for="required-{id}">
+                    必填项
+                </label>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="image-question-template">
+    <div class="question-card image-type" data-type="image">
+        <span class="question-counter">{num}</span>
+        <span class="badge bg-success type-badge">图片上传</span>
+        <button type="button" class="delete-question btn-close" aria-label="删除"></button>
+        <div class="mb-3">
+            <label class="form-label">问题文本</label>
+            <input type="text" class="form-control question-title" placeholder="请输入问题文本，例如：请上传您的照片或相关图片">
+        </div>
+        <div class="mb-3">
+            <div class="form-text text-muted">
+                <i class="fas fa-info-circle me-1"></i>用户可以上传JPG、PNG、GIF等格式的图片
+            </div>
+        </div>
+        <div class="question-controls">
+            <div class="form-check form-switch required-toggle">
+                <input class="form-check-input question-required" type="checkbox" id="required-{id}">
+                <label class="form-check-label" for="required-{id}">
+                    必填项
+                </label>
+            </div>
+        </div>
+    </div>
+</template>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 初始化变量
+    let questions = [];
+    const formTitleInput = document.getElementById('form-title');
+    const formDescriptionInput = document.getElementById('form-description');
+    const questionsContainer = document.getElementById('questions-container');
+    
+    // 检查是否有模板数据
+    {% if template %}
+    // 加载模板标题和描述
+    formTitleInput.value = `{{ template.title }}`;
+    formDescriptionInput.value = `{{ template.description }}`;
+    
+    // 加载模板问题
+    questions = {{ template.questions|tojson }};
+    
+    // 初始化后立即渲染问题
+    renderQuestions();
+    {% else %}
+    // 没有模板，初始化空问题数组
+    questions = [];
+    {% endif %}
+    
+    // 更新空状态
+    updateEmptyState();
+    
+    // 添加问题按钮事件处理
+    document.querySelectorAll('.add-question-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const type = this.getAttribute('data-type');
+            addQuestion(type);
+        });
+    });
+    
+    // 提交表单事件处理
+    document.getElementById('submit-form-btn').addEventListener('click', function() {
+        submitForm();
+    });
+    
+    // 添加问题函数
+    function addQuestion(type) {
+        const newQuestion = {
+            type: type,
+            title: getDefaultQuestionTitle(type),
+            required: true,
+            options: []
+        };
+        
+        // 为单选和多选题添加默认选项
+        if (type === 'radio' || type === 'checkbox') {
+            newQuestion.options = ['选项1', '选项2', '选项3'];
+        }
+        
+        questions.push(newQuestion);
+        renderQuestions();
+        updateEmptyState();
+    }
+    
+    // 获取问题类型的默认标题
+    function getDefaultQuestionTitle(type) {
+        switch(type) {
+            case 'text': return '文本题';
+            case 'radio': return '单选题';
+            case 'checkbox': return '多选题';
+            case 'signature': return '签名题';
+            case 'image': return '图片上传题';
+            default: return '新问题';
+        }
+    }
+    
+    // 渲染所有问题
+    function renderQuestions() {
+        questionsContainer.innerHTML = '';
+        
+        questions.forEach((question, index) => {
+            const questionCard = createQuestionCard(question, index);
+            questionsContainer.appendChild(questionCard);
+        });
+    }
+    
+    // 创建问题卡片
+    function createQuestionCard(question, index) {
+        const card = document.createElement('div');
+        card.className = `question-card ${question.type}-type`;
+        card.innerHTML = `
+            <span class="question-counter">${index + 1}</span>
+            <div class="delete-question" data-index="${index}">
+                <i class="fas fa-times"></i>
+            </div>
+            <span class="badge bg-secondary type-badge">
+                ${getQuestionTypeLabel(question.type)}
+            </span>
+            <div class="mb-3">
+                <label class="form-label">问题标题</label>
+                <input type="text" class="form-control question-title" value="${question.title}" data-index="${index}">
+            </div>
+        `;
+        
+        // 为不同类型的问题添加特定UI
+        if (question.type === 'radio' || question.type === 'checkbox') {
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'options-container mb-3';
+            optionsContainer.innerHTML = `
+                <label class="form-label">选项</label>
+            `;
+            
+            question.options.forEach((option, optionIndex) => {
+                const optionRow = document.createElement('div');
+                optionRow.className = 'option-row input-group mb-2';
+                optionRow.innerHTML = `
+                    <input type="text" class="form-control option-text" value="${option}" data-index="${index}" data-option-index="${optionIndex}">
+                    <button class="btn btn-outline-danger remove-option" type="button" data-index="${index}" data-option-index="${optionIndex}">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                `;
+                optionsContainer.appendChild(optionRow);
+            });
+            
+            const addOptionBtn = document.createElement('button');
+            addOptionBtn.className = 'btn btn-sm btn-outline-primary add-option';
+            addOptionBtn.setAttribute('data-index', index);
+            addOptionBtn.innerHTML = '<i class="fas fa-plus me-1"></i> 添加选项';
+            optionsContainer.appendChild(addOptionBtn);
+            
+            card.appendChild(optionsContainer);
+        }
+        
+        // 添加必填选项切换
+        const requiredToggle = document.createElement('div');
+        requiredToggle.className = 'question-controls';
+        requiredToggle.innerHTML = `
+            <div class="required-toggle form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="required-toggle-${index}" data-index="${index}" ${question.required ? 'checked' : ''}>
+                <label class="form-check-label" for="required-toggle-${index}">必填</label>
+            </div>
+        `;
+        card.appendChild(requiredToggle);
+        
+        return card;
+    }
+    
+    // 获取问题类型的标签
+    function getQuestionTypeLabel(type) {
+        switch(type) {
+            case 'text': return '文本';
+            case 'radio': return '单选';
+            case 'checkbox': return '多选';
+            case 'signature': return '签名';
+            case 'image': return '图片';
+            default: return '未知';
+        }
+    }
+    
+    // 删除问题
+    questionsContainer.addEventListener('click', function(e) {
+        if (e.target.closest('.delete-question')) {
+            const index = e.target.closest('.delete-question').getAttribute('data-index');
+            questions.splice(index, 1);
+            renderQuestions();
+            updateEmptyState();
+        }
+    });
+    
+    // 修改问题标题
+    questionsContainer.addEventListener('input', function(e) {
+        if (e.target.classList.contains('question-title')) {
+            const index = e.target.getAttribute('data-index');
+            questions[index].title = e.target.value;
+        }
+    });
+    
+    // 添加选项
+    questionsContainer.addEventListener('click', function(e) {
+        if (e.target.closest('.add-option')) {
+            const index = e.target.closest('.add-option').getAttribute('data-index');
+            questions[index].options.push(`选项${questions[index].options.length + 1}`);
+            renderQuestions();
+        }
+    });
+    
+    // 删除选项
+    questionsContainer.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-option')) {
+            const btn = e.target.closest('.remove-option');
+            const questionIndex = btn.getAttribute('data-index');
+            const optionIndex = btn.getAttribute('data-option-index');
+            
+            questions[questionIndex].options.splice(optionIndex, 1);
+            renderQuestions();
+        }
+    });
+    
+    // 修改选项文本
+    questionsContainer.addEventListener('input', function(e) {
+        if (e.target.classList.contains('option-text')) {
+            const questionIndex = e.target.getAttribute('data-index');
+            const optionIndex = e.target.getAttribute('data-option-index');
+            questions[questionIndex].options[optionIndex] = e.target.value;
+        }
+    });
+    
+    // 切换必填选项
+    questionsContainer.addEventListener('change', function(e) {
+        if (e.target.closest('.required-toggle')) {
+            const index = e.target.getAttribute('data-index');
+            questions[index].required = e.target.checked;
+        }
+    });
+    
+    // 更新空状态显示
+    function updateEmptyState() {
+        const emptyState = document.getElementById('empty-questions');
+        if (questions.length === 0) {
+            emptyState.style.display = 'block';
+        } else {
+            emptyState.style.display = 'none';
+        }
+    }
+    
+    // 提交表单
+    function submitForm() {
+        const title = formTitleInput.value.trim();
+        
+        if (!title) {
+            alert('请输入表单标题');
+            formTitleInput.focus();
+            return;
+        }
+        
+        if (questions.length === 0) {
+            alert('请至少添加一个问题');
+            return;
+        }
+        
+        // 显示加载状态
+        const submitBtn = document.getElementById('submit-form-btn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 正在保存...';
+        submitBtn.disabled = true;
+        
+        // 准备数据
+        const formData = {
+            title: title,
+            description: formDescriptionInput.value.trim(),
+            questions: questions
+        };
+        
+        // 发送请求
+        fetch('/api/forms', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = `/results/${data.form_id}`;
+            } else {
+                alert('保存失败：' + (data.message || '未知错误'));
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('发生错误：' + error);
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    }
+});
+</script>
+{% endblock %} 

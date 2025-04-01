@@ -1,0 +1,607 @@
+{% extends "layout.html" %}
+
+{% block title %}收集表系统 - 管理员控制台{% endblock %}
+
+{% block custom_styles %}
+.dashboard-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(50%, -50%);
+}
+
+.dashboard-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.dashboard-welcome {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 800px;
+}
+
+.stats-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    flex: 1;
+    min-width: 200px;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+}
+
+.stat-card.forms {
+    border-left-color: #4361ee;
+}
+
+.stat-card.responses {
+    border-left-color: #3a86ff;
+}
+
+.stat-card.completion {
+    border-left-color: #4895ef;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.dashboard-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.dashboard-action-btn {
+    flex: 1;
+    min-width: 200px;
+    text-align: left;
+    padding: 15px 20px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    border: none;
+    display: flex;
+    align-items: center;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-action-btn:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+}
+
+.dashboard-action-btn i {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(67, 97, 238, 0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin-right: 15px;
+}
+
+.dashboard-section {
+    margin-bottom: 30px;
+}
+
+.dashboard-section-title {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+}
+
+.dashboard-section-icon {
+    margin-right: 10px;
+    background-color: var(--primary-color);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-table {
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.form-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.badge-admin {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.badge-super-admin {
+    background-color: #ff7e67;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.empty-forms {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: white;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.empty-illustration {
+    width: 150px;
+    opacity: 0.7;
+    margin-bottom: 20px;
+}
+
+/* 移动端优化 */
+@media (max-width: 767.98px) {
+    .dashboard-header {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .dashboard-title {
+        font-size: 1.5rem;
+    }
+    
+    .dashboard-welcome {
+        font-size: 0.95rem;
+    }
+    
+    .dashboard-actions {
+        gap: 10px;
+    }
+    
+    .dashboard-action-btn {
+        min-width: 100%;
+        padding: 12px 15px;
+    }
+    
+    .dashboard-action-btn i {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+    
+    .stat-card {
+        min-width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .action-buttons {
+        flex-wrap: wrap;
+    }
+    
+    .form-table-mobile-card {
+        display: none;
+    }
+    
+    .action-buttons .btn {
+        padding: 5px 8px;
+        font-size: 0.8rem;
+    }
+    
+    .form-card {
+        display: flex;
+        flex-direction: column;
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-card-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+    }
+    
+    .form-card-desc {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+    
+    .form-card-meta {
+        font-size: 0.8rem;
+        color: #adb5bd;
+        margin-bottom: 15px;
+    }
+    
+    .form-card-actions {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .dashboard-section-title {
+        font-size: 1.2rem;
+    }
+    
+    .badge-admin, .badge-super-admin {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+    }
+}
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1 class="dashboard-title">管理员控制台</h1>
+    <p class="dashboard-welcome">
+        欢迎回来，{{ admin.username }}
+        {% if admin.role == 2 %}
+        <span class="badge badge-super-admin">超级管理员</span>
+        {% else %}
+        <span class="badge badge-admin">管理员</span>
+        {% endif %}
+    </p>
+    <div class="d-flex mt-4">
+        <a href="/create_form" class="btn btn-light me-2">
+            <i class="fas fa-plus-circle me-2"></i>创建新表单
+        </a>
+        {% if admin.role == 2 %}
+        <a href="{{ url_for('admin_manage') }}" class="btn btn-light">
+            <i class="fas fa-users-cog me-2"></i>管理员管理
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="dashboard-actions">
+    <a href="/create_form" class="dashboard-action-btn text-decoration-none">
+        <i class="fas fa-plus"></i>
+        <div>
+            <h5 class="mb-1">创建表单</h5>
+            <p class="mb-0 text-muted small">设计新的收集表</p>
+        </div>
+    </a>
+    {% if admin.role == 2 %}
+    <a href="{{ url_for('admin_manage') }}" class="dashboard-action-btn text-decoration-none">
+        <i class="fas fa-users-cog"></i>
+        <div>
+            <h5 class="mb-1">管理员管理</h5>
+            <p class="mb-0 text-muted small">添加、删除管理员账号</p>
+        </div>
+    </a>
+    {% endif %}
+    <a href="{{ url_for('admin_logout') }}" class="dashboard-action-btn text-decoration-none">
+        <i class="fas fa-sign-out-alt"></i>
+        <div>
+            <h5 class="mb-1">退出登录</h5>
+            <p class="mb-0 text-muted small">安全退出系统</p>
+        </div>
+    </a>
+</div>
+
+<div class="dashboard-section">
+    <h2 class="dashboard-section-title">
+        <span class="dashboard-section-icon"><i class="fas fa-clipboard-list"></i></span>
+        我的表单列表
+    </h2>
+    
+    {% if forms %}
+    <!-- 桌面端表格视图 -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-hover form-table">
+            <thead>
+                <tr>
+                    <th width="5%">#</th>
+                    <th width="25%">表单标题</th>
+                    <th width="20%">描述</th>
+                    <th width="15%">创建时间</th>
+                    <th width="35%">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in forms %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td><strong>{{ form.title }}</strong></td>
+                    <td>{{ form.description or '无描述' }}</td>
+                    <td>{{ form.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="/form/{{ form.id }}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="填写表单">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="/results/{{ form.id }}" class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="查看结果">
+                                <i class="fas fa-chart-bar"></i>
+                            </a>
+                            <a href="/export/{{ form.id }}" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" title="导出Excel">
+                                <i class="fas fa-file-excel"></i>
+                            </a>
+                            <button class="btn btn-sm btn-outline-secondary share-form-btn" data-form-id="{{ form.id }}" data-form-title="{{ form.title }}" data-bs-toggle="tooltip" title="分享表单">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                            <a href="/create_form?template_id={{ form.id }}" class="btn btn-sm btn-outline-dark" data-bs-toggle="tooltip" title="作为模板">
+                                <i class="fas fa-copy"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- 移动端卡片视图 -->
+    <div class="d-md-none">
+        {% for form in forms %}
+        <div class="form-card">
+            <div class="form-card-title">{{ form.title }}</div>
+            <div class="form-card-desc">{{ form.description or '无描述' }}</div>
+            <div class="form-card-meta">
+                <i class="far fa-calendar-alt me-1"></i> {{ form.created_at.strftime('%Y-%m-%d %H:%M') }}
+            </div>
+            <div class="form-card-actions">
+                <a href="/form/{{ form.id }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-edit me-1"></i> 填写
+                </a>
+                <a href="/results/{{ form.id }}" class="btn btn-sm btn-outline-success">
+                    <i class="fas fa-chart-bar me-1"></i> 结果
+                </a>
+                <a href="/export/{{ form.id }}" class="btn btn-sm btn-outline-info">
+                    <i class="fas fa-file-excel me-1"></i> 导出
+                </a>
+                <button class="btn btn-sm btn-outline-secondary share-form-btn" 
+                        data-form-id="{{ form.id }}" 
+                        data-form-title="{{ form.title }}">
+                    <i class="fas fa-share-alt me-1"></i> 分享
+                </button>
+                <a href="/create_form?template_id={{ form.id }}" class="btn btn-sm btn-outline-dark">
+                    <i class="fas fa-copy me-1"></i> 模板
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-forms">
+        <img src="https://cdn-icons-png.flaticon.com/512/6134/6134065.png" alt="空表单" class="empty-illustration">
+        <h4>您还没有创建任何表单</h4>
+        <p class="text-muted mb-4">点击"创建新表单"按钮开始设计您的第一个表单</p>
+        <a href="/create_form" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-2"></i>创建新表单
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- 创建新表单卡片 -->
+<div class="card mt-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-1">
+                    <i class="fas fa-plus-circle me-2 text-success"></i>新建表单
+                </h5>
+                <p class="mb-0 text-muted small">创建全新的表单或基于模板创建</p>
+            </div>
+            <div class="btn-group">
+                <a href="/create_form" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i> 创建空白表单
+                </a>
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="visually-hidden">更多选项</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    {% if forms %}
+                    <li><h6 class="dropdown-header">使用模板创建</h6></li>
+                    {% for form in forms %}
+                    <li><a class="dropdown-item" href="/create_form?template_id={{ form.id }}">{{ form.title }}</a></li>
+                    {% endfor %}
+                    {% else %}
+                    <li><a class="dropdown-item disabled" href="#">暂无可用模板</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 初始化工具提示
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+    
+    // 微信分享功能
+    window.shareToWechat = function(event, url, title) {
+        event.preventDefault();
+        // 创建二维码模态框
+        const wechatModalHtml = `
+            <div class="modal fade" id="wechatShareModal" tabindex="-1" aria-labelledby="wechatShareModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="wechatShareModalLabel">微信分享</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <p>请使用微信扫描下方二维码分享</p>
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}" 
+                                 alt="微信分享二维码" class="img-fluid mb-2">
+                            <p class="small text-muted">或复制链接后在微信中粘贴</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // 添加模态框到页面
+        const modalContainer = document.createElement('div');
+        modalContainer.innerHTML = wechatModalHtml;
+        document.body.appendChild(modalContainer);
+        
+        // 显示模态框
+        const modal = new bootstrap.Modal(document.getElementById('wechatShareModal'));
+        modal.show();
+        
+        // 模态框关闭后移除
+        document.getElementById('wechatShareModal').addEventListener('hidden.bs.modal', function() {
+            document.body.removeChild(modalContainer);
+        });
+    };
+    
+    // 分享表单功能
+    document.querySelectorAll('.share-form-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const formId = this.getAttribute('data-form-id');
+            const formTitle = this.getAttribute('data-form-title');
+            const formUrl = `${window.location.origin}/form/${formId}`;
+            
+            // 创建模态框
+            const modalHtml = `
+                <div class="modal fade" id="shareFormModal" tabindex="-1" aria-labelledby="shareFormModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-fullscreen-sm-down">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="shareFormModalLabel">分享 "${formTitle}" 表单</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>使用以下链接分享您的表单给其他人：</p>
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" id="formShareLink" value="${formUrl}" readonly>
+                                    <button class="btn btn-outline-primary" type="button" id="copyShareLink">复制</button>
+                                </div>
+                                <div class="d-flex flex-column flex-md-row justify-content-center mt-4 gap-2">
+                                    <a href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(formUrl)}" target="_blank" class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-qrcode me-1"></i> 显示二维码
+                                    </a>
+                                    <a href="https://connect.qq.com/widget/shareqq/index.html?url=${encodeURIComponent(formUrl)}&title=${encodeURIComponent(`请填写表单: ${formTitle}`)}&summary=${encodeURIComponent(`请填写此表单`)}" target="_blank" class="btn btn-outline-info w-100">
+                                        <i class="fab fa-qq me-1"></i> QQ分享
+                                    </a>
+                                    <a href="https://wechat.com" onclick="shareToWechat(event, '${formUrl}', '${formTitle}')" class="btn btn-outline-success w-100">
+                                        <i class="fab fa-weixin me-1"></i> 微信分享
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 添加模态框到页面
+            const modalContainer = document.createElement('div');
+            modalContainer.innerHTML = modalHtml;
+            document.body.appendChild(modalContainer);
+            
+            // 显示模态框
+            const modal = new bootstrap.Modal(document.getElementById('shareFormModal'));
+            modal.show();
+            
+            // 复制链接功能
+            document.getElementById('copyShareLink').addEventListener('click', function() {
+                const shareLink = document.getElementById('formShareLink');
+                shareLink.select();
+                document.execCommand('copy');
+                
+                // 更改按钮文本显示已复制
+                this.innerHTML = '<i class="fas fa-check me-1"></i> 已复制';
+                setTimeout(() => {
+                    this.innerHTML = '复制';
+                }, 2000);
+            });
+            
+            // 模态框关闭后移除
+            document.getElementById('shareFormModal').addEventListener('hidden.bs.modal', function() {
+                document.body.removeChild(modalContainer);
+            });
+        });
+    });
+});
+</script>
+{% endblock %} 

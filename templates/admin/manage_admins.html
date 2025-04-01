@@ -1,0 +1,255 @@
+{% extends "layout.html" %}
+
+{% block title %}收集表系统 - 管理员管理{% endblock %}
+
+{% block custom_styles %}
+.admin-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(50%, -50%);
+}
+
+.admin-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.admin-description {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 800px;
+}
+
+.admin-table {
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.admin-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.badge-admin {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.badge-super-admin {
+    background-color: #ff7e67;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.add-admin-form {
+    background-color: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+
+.add-admin-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.form-floating>label {
+    padding-left: 1.25rem;
+}
+
+.no-admins {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: white;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.no-admins img {
+    width: 150px;
+    opacity: 0.7;
+    margin-bottom: 20px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1 class="admin-title">管理员管理</h1>
+    <p class="admin-description">添加或删除管理员账号，管理系统权限</p>
+    <div class="d-flex mt-4">
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-light me-2">
+            <i class="fas fa-arrow-left me-2"></i>返回仪表板
+        </a>
+        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+            <i class="fas fa-user-plus me-2"></i>添加管理员
+        </button>
+    </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+{% if admins %}
+<div class="table-responsive">
+    <table class="table table-hover admin-table">
+        <thead>
+            <tr>
+                <th width="5%">#</th>
+                <th width="30%">用户名</th>
+                <th width="20%">角色</th>
+                <th width="25%">创建时间</th>
+                <th width="20%">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for admin in admins %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td><strong>{{ admin.username }}</strong></td>
+                <td>
+                    {% if admin.role == 2 %}
+                    <span class="badge badge-super-admin">超级管理员</span>
+                    {% else %}
+                    <span class="badge badge-admin">普通管理员</span>
+                    {% endif %}
+                </td>
+                <td>{{ admin.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>
+                    {% if admin.id != session.get('admin_id') %}
+                    <form action="{{ url_for('admin_delete', admin_id=admin.id) }}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                onclick="return confirm('确定要删除管理员 {{ admin.username }} 吗？');">
+                            <i class="fas fa-trash"></i> 删除
+                        </button>
+                    </form>
+                    {% else %}
+                    <span class="text-muted small">当前账号</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="no-admins">
+    <img src="https://cdn-icons-png.flaticon.com/512/6596/6596121.png" alt="无管理员">
+    <h4>没有发现任何管理员账号</h4>
+    <p class="text-muted mb-4">点击"添加管理员"按钮创建第一个管理员账号</p>
+</div>
+{% endif %}
+
+<!-- 添加管理员模态框 -->
+<div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAdminModalLabel">添加新管理员</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('admin_add') }}" method="post">
+                    <div class="mb-4">
+                        <label for="username" class="form-label">用户名</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control" id="username" name="username" 
+                                   placeholder="请输入管理员用户名" required autofocus>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="password" class="form-label">密码</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="请设置管理员密码" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">管理员类型</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="role" 
+                                   id="roleAdmin" value="1" checked>
+                            <label class="form-check-label" for="roleAdmin">
+                                普通管理员（只能管理自己的表单）
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="role" 
+                                   id="roleSuperAdmin" value="2">
+                            <label class="form-check-label" for="roleSuperAdmin">
+                                超级管理员（可以管理所有表单和管理员）
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus me-2"></i>添加管理员
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 自动显示模态框（如果有错误消息）
+    {% if get_flashed_messages(category_filter=["danger"]) %}
+        var addAdminModal = new bootstrap.Modal(document.getElementById('addAdminModal'));
+        addAdminModal.show();
+    {% endif %}
+});
+</script>
+{% endblock %} 
